@@ -3,20 +3,21 @@ pragma solidity ^0.8.20;
 
 import "forge-std/Script.sol";
 
-interface IUniswapV2Factory {
-    function createPair(address tokenA, address tokenB) external returns (address pair);
-    function setFeeTo(address) external;
-    function setFeeToSetter(address) external;
+interface IFactoryDeployer {
+    function deploy(address feeToSetter) external returns (address);
 }
 
-contract DeployFactory is Script {
-    address constant FACTORY = 0xD324500DC51e96B98f0F6E3A2fF6838C8D082f98;
-
+contract CallDeployFactory is Script {
     function run() external {
+        address factoryDeployer = 0x1c5D63FA1Ea4cFB9FD34b44a420C3DB835dd28bf;
+        address feeToSetter = msg.sender; // or any address you want
+
         vm.startBroadcast();
-        IUniswapV2Factory(FACTORY).setFeeTo(msg.sender);
+
+        address deployedFactory = IFactoryDeployer(factoryDeployer).deploy(feeToSetter);
+
         vm.stopBroadcast();
 
-        console.log("Factory configured at:", FACTORY);
+        console.log("UniswapV2Factory deployed at:", deployedFactory);
     }
 }

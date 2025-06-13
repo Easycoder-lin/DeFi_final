@@ -5,8 +5,8 @@ import "forge-std/Script.sol";
 import "../src/MinimalRouter.sol";
 
 contract DeployMinimalRouter is Script {
-    address constant FACTORY = 0xD324500DC51e96B98f0F6E3A2fF6838C8D082f98;
-    address constant WETH = 0x8842e4eAaA3f6190872847DEaD4FF165619D8309;
+    address constant FACTORY = 0x4a727c9f3418bDfcc35d72a34e8150F0872d18CE;
+    address constant WETH = 0x5a5a6E83d19AA8a06A15d4aFeef6557593f5fF5a;
 
     function run() external {
         vm.startBroadcast();

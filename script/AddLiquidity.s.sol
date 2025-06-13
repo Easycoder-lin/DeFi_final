@@ -2,34 +2,30 @@
 pragma solidity ^0.8.20;
 
 import "forge-std/Script.sol";
-import "../lib/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
-import "../src/DAI.sol";
+import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-interface IWETH {
-    function deposit() external payable;
-    function approve(address spender, uint amount) external returns (bool);
-}
-
-contract AddLiquidity is Script {
-    address constant ROUTER = 0xD324500DC51e96B98f0F6E3A2fF6838C8D082f98;
-    address constant WETH_address = 0x8842e4eAaA3f6190872847DEaD4FF165619D8309;
-    address constant DAI_address = 0x051Acd6dEd52387c6F0450FF465Eca83d306D806;
-
+contract AddLiquidityWETHDAI is Script {
     function run() external {
+        address router = 0x41651C87c2a689Cc9EEC3125BDaCe643D4a57846;
+        address dai = 0xfbe3Bf8B33995787ab6F967D0c0b124Cc96c352A;
+        address weth = 0x5a5a6E83d19AA8a06A15d4aFeef6557593f5fF5a;
+
+        uint daiAmount = 100 ether;     // 100 DAI
+        uint wethAmount = 0.01 ether;   // 0.05 WETH
+
         vm.startBroadcast();
 
-        // Wrap some ETH
-        IWETH(WETH_address).deposit{value: 1 ether}();
-        IWETH(WETH_address).approve(ROUTER, type(uint).max);
+        // Approve both tokens to router
+        IERC20(dai).approve(router, daiAmount);
+        IERC20(weth).approve(router, wethAmount);
 
-        // Approve DAI
-        DAI(DAI_address).approve(ROUTER, type(uint).max);
-
-        IUniswapV2Router02(ROUTER).addLiquidity(
-            WETH_address,
-            DAI_address,
-            1 ether,
-            1000 ether,
+        // Add liquidity with two ERC20 tokens
+        IUniswapV2Router02(router).addLiquidity(
+            weth,
+            dai,
+            wethAmount,
+            daiAmount,
             0,
             0,
             msg.sender,
@@ -38,6 +34,4 @@ contract AddLiquidity is Script {
 
         vm.stopBroadcast();
     }
-
-    receive() external payable {}
 }

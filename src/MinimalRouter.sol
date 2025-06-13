@@ -50,6 +50,40 @@ contract MinimalRouter {
 
         liquidity = IUniswapV2Pair(pair).mint(to);
     }
+    
+    function addLiquidity(
+        address tokenA,
+        address tokenB,
+        uint amountADesired,
+        uint amountBDesired,
+        uint amountAMin,
+        uint amountBMin,
+        address to,
+        uint deadline
+    ) external returns (uint amountA, uint amountB, uint liquidity) {
+        require(block.timestamp <= deadline, "EXPIRED");
+
+        // Sort tokens
+        (address token0, address token1) = sortTokens(tokenA, tokenB);
+        (uint amount0Desired, uint amount1Desired) = tokenA == token0
+            ? (amountADesired, amountBDesired)
+            : (amountBDesired, amountADesired);
+
+        address pair = IUniswapV2Factory(factory).getPair(tokenA, tokenB);
+        if (pair == address(0)) {
+            pair = IUniswapV2Factory(factory).createPair(tokenA, tokenB);
+        }
+
+        // Transfer both tokens to the pair contract
+        IERC20(tokenA).transferFrom(msg.sender, pair, amountADesired);
+        IERC20(tokenB).transferFrom(msg.sender, pair, amountBDesired);
+
+        amountA = amountADesired;
+        amountB = amountBDesired;
+
+        // Mint LP tokens to the user
+        liquidity = IUniswapV2Pair(pair).mint(to);
+    }
 
     function swapExactETHForTokensSupportingFeeOnTransferTokens(
         uint amountOutMin,
