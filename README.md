@@ -1,66 +1,139 @@
-## Foundry
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+# LeanSwap: Minimal Uniswap V2 with Automated Trading on Sepolia
 
-Foundry consists of:
+This project implements a minimal Uniswap V2 deployment on the Sepolia testnet with a simplified custom router. It also includes a DeFi trading bot capable of executing automated token swaps using ETH.
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+---
 
-## Documentation
+## 🌐 Overview
 
-https://book.getfoundry.sh/
+**LeanSwap** is a custom DeFi infrastructure designed for testing and experimentation. It features:
 
-## Usage
+* 🧱 A lightweight Uniswap V2 clone (Factory, Pair)
+* 🔀 A minimal custom `UniswapV2Router02` to reduce bytecode size (EIP-170 compliant)
+* 🤖 A Trader smart contract for automated ETH → Token swaps
+* 🧪 Foundry-based development and deployment scripts
+* 🌐 Deployment on Sepolia testnet
 
-### Build
+---
 
-```shell
-$ forge build
+## 📦 Project Structure
+
+```
+.
+├── src/
+│   ├── UniswapV2Factory.sol
+│   ├── UniswapV2Pair.sol
+│   ├── MinimalRouter.sol
+│   ├── Trader.sol
+│   └── interfaces/
+├── script/
+│   ├── Deploy.s.sol
+│   └── CreatePair.s.sol
+├── test/
+│   └── Trader.t.sol
+├── foundry.toml
+└── README.md
 ```
 
-### Test
+---
 
-```shell
-$ forge test
+## 🚀 Getting Started
+
+### Prerequisites
+
+* [Foundry](https://book.getfoundry.sh/getting-started/installation)
+* Node.js + Metamask (for interacting via frontend or Sepolia wallet)
+
+### Install Dependencies
+
+```bash
+forge install
 ```
 
-### Format
+### Compile Contracts
 
-```shell
-$ forge fmt
+```bash
+forge build
 ```
 
-### Gas Snapshots
+### Run Tests
 
-```shell
-$ forge snapshot
+```bash
+forge test
 ```
 
-### Anvil
+---
 
-```shell
-$ anvil
+## 🛠 Deployment
+
+### 1. Deploy Mock Tokens
+
+```bash
+forge script script/DeployMocks.s.sol --rpc-url <SEPOLIA_RPC_URL> --private-key <PRIVATE_KEY> --broadcast
+```
+### 2. Deploy Factory
+
+```bash
+forge script script/DeployFactory.s.sol --rpc-url <SEPOLIA_RPC_URL> --private-key <PRIVATE_KEY> --broadcast
 ```
 
-### Deploy
+### 3. Deploy Minimal Router
 
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
+Deploy `MinimalRouter.sol` with:
+
+* `FACTORY`: FACTORY address on Sepolia
+* `WETH`: WETH address on Sepolia
+
+```bash
+forge script script/DeployMinimalRouter.s.sol --rpc-url <SEPOLIA_RPC_URL> --private-key <PRIVATE_KEY> --broadcast
 ```
 
-### Cast
+### 4. Create a Trading Pair
 
-```shell
-$ cast <subcommand>
+Deploy `CreatePair.sol` with:
+
+* `FACTORY`: FACTORY address on Sepolia
+* `WETH`: WETH address on Sepolia
+* `DAI`: DAI address on Sepolia
+
+```bash
+forge script script/CreatePair.s.sol --rpc-url <SEPOLIA_RPC_URL> --private-key <PRIVATE_KEY> --broadcast
 ```
 
-### Help
+### 4. Add liquidity to Pair just created
 
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
+Deploy `Addliquidity.s.sol` with:
+
+* `router`: MinimalRouter address
+* * `dai`: DAI address on Sepolia
+* `weth`: WETH address on Sepolia
+
+
+```bash
+forge script script/Addliquidity.s.sol --rpc-url <SEPOLIA_RPC_URL> --private-key <PRIVATE_KEY> --broadcast
 ```
+
+### 5. Deploy Trader Contract
+
+Deploy `Trader.sol` with:
+
+* `ROUTER`: MinimalRouter address
+* `WETH`: WETH address on Sepolia
+* `DAI`: DAI address on Sepolia
+
+```bash
+forge script script/DeployTrader.s.sol --rpc-url <SEPOLIA_RPC_URL> --private-key <PRIVATE_KEY> --broadcast
+```
+
+Once deployed, call `executeTrade()` with ETH.
+
+---
+
+## 🧪 Notes
+
+* The custom router is intentionally minimized to stay within the EVM bytecode size limit.
+* Only `swapExactETHForTokensSupportingFeeOnTransferTokens` is implemented.
+* Not production-ready — lacks complete safety checks.
+
+---
