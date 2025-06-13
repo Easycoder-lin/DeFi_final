@@ -11,8 +11,8 @@ contract AddLiquidityWETHDAI is Script {
         address dai = 0xfbe3Bf8B33995787ab6F967D0c0b124Cc96c352A;
         address weth = 0x5a5a6E83d19AA8a06A15d4aFeef6557593f5fF5a;
 
-        uint daiAmount = 100 ether;     // 100 DAI
-        uint wethAmount = 0.01 ether;   // 0.05 WETH
+        uint daiAmount = 1000 ether;     // 100 DAI
+        uint wethAmount = 0.1 ether;   // 0.1 WETH
 
         vm.startBroadcast();
 

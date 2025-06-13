@@ -16,12 +16,7 @@ contract Trader {
         DAI = _dai;
     }
 
-    modifier onlyOwner() {
-        require(msg.sender == owner, "Not owner");
-        _;
-    }
-
-    function executeTrade(uint amountOutMin) external payable onlyOwner {
+    function executeTrade(uint amountOutMin) external payable {
         address[] memory path = new address[](2);
         path[0] = WETH;
         path[1] = DAI;
@@ -29,7 +24,7 @@ contract Trader {
         uniswap.swapExactETHForTokensSupportingFeeOnTransferTokens{ value: msg.value }(
             amountOutMin,
             path,
-            owner,
+            msg.sender,
             block.timestamp + 300
         );
     }
